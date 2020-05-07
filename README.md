@@ -8,9 +8,8 @@ In this tutorial we will take a look at three of them.
 3. Vue v2.6
 
 ## Overview
-1) Importing Vue into Jinja templates
-2) Complete Separation of Flask and a Vue Single-Page Application (SPA)
-2.5) Complete Separation of Flask and a Vue Single-Page Application (SPA) with Server-Side Rendering (SSR)
-3) Partial separation using Flask blueprints
+1. Importing Vue into Jinja templates
+2. Complete Separation of Flask and a Vue Single-Page Application (SPA)
+3. Partial separation using Flask blueprints
 
 
