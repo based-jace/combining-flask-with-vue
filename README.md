@@ -37,6 +37,7 @@ You can import the Vue library either through a CDN or by serving it yourself al
 * Small web apps literally using a single HTML page or two (as opposed to a Single-Page Application with its own Dynamic Routing - see method 2 for more info)
 * Building functionality onto an already existing web app
 * Adding bits of reactivity to an app without fully committing to a front-end framework
+* Projects that don't need the functionality/headache of a backend
 
 ### Setup
 
@@ -92,12 +93,24 @@ Just like in Method 2, your front-end and back-end will be completely separate, 
 ## 3) Partial separation using Flask blueprints
 
 ### Method Overview
+Perhaps you already have a small API developed and you want to build a web app as more of a means to an end 
+rather than as the main event. Or maybe you just don't want to deal with the potential frustration that could result 
+when deploying completely separate front-ends and back-ends. In that case you could sort-of meet in the middle 
+by keeping your Flask API, but building on a Vue front-end with its own Flask blueprint.
 
 ### Pros
+* No need to build a complex front-end if it isn't necessary
+* Similar to method 1 with the added benefit of better code organization
+* You can always expand the front-end and back-end as needed later on
 
 ### Cons
+* Workarounds might be necessary to allow a full SPA
+* Accessing the API might be slightly more annoying from a separate front-end (such as a mobile app)
+as the front-end and back-end are not completely separate
 
 ### Best For
+* Projects where functionality is more important than UI
+* You're building a front-end onto an already-existing Flask API
 
 ### Setup
 
