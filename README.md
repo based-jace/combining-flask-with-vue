@@ -5,7 +5,6 @@ In this tutorial we will take a look at three of them by analyzing the pros and 
 <i>Dependencies:</i>
 1. Python v3.8
 2. Flask v1.1
-3. Vue v2.6
 
 ## Overview
 1\) Importing Vue into Jinja templates
@@ -39,6 +38,9 @@ You can import the Vue library either through a CDN or by serving it yourself al
 * Adding bits of reactivity to an app without fully committing to a front-end framework
 * Projects that don't need the functionality/headache of a backend
 
+### Additional Dependencies
+None as we'll be importing Vue via a Content Delivery Network (CDN)!
+
 ### Setup
 
 ## 2) Complete Separation of Flask and a Vue Single-Page Application (SPA)
@@ -65,6 +67,10 @@ You will generate an app using vue-cli from npm. You'll use Flask to create an A
 * Apps where UX is more important than SEO
 * Back-ends that need to be accessible by multiple front-ends
 
+### Additional Dependencies
+1. npm v6.15
+2. vue v2.6
+
 ### Setup
 
 ## 2.5) Complete Separation of Flask and a Vue Single-Page Application (SPA) with Server-Side Rendering (SSR) using Nuxt
@@ -88,6 +94,11 @@ Just like in Method 2, your front-end and back-end will be completely separate, 
 ### Best For
 * Apps where SEO is as important as UX
 
+### Additional Dependencies
+1. npm v6.15
+2. vue v2.6
+3. nuxt v2.12
+
 ### Setup
 
 ## 3) Partial separation using Flask blueprints
@@ -97,6 +108,8 @@ Perhaps you already have a small API developed and you want to build a web app a
 rather than as the main event. Or maybe you just don't want to deal with the potential frustration that could result 
 when deploying completely separate front-ends and back-ends. In that case you could sort-of meet in the middle 
 by keeping your Flask API, but building on a Vue front-end with its own Flask blueprint.
+
+This will look a lot like method 1, but the code will be more organized.
 
 ### Pros
 * No need to build a complex front-end if it isn't necessary
@@ -111,6 +124,10 @@ as the front-end and back-end are not completely separate
 ### Best For
 * Projects where functionality is more important than UI
 * You're building a front-end onto an already-existing Flask API
+* Small web apps that are made up of only a couple of HTML pages
+
+### Additional Dependencies
+Similarly to method 1, we will be using a Vue CDN.
 
 ### Setup
 
