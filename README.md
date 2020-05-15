@@ -470,6 +470,28 @@ app.register_blueprint(api_bp, url_prefix='/api_v1')
 app.register_blueprint(client_bp)
 ```
 
+Final file tree:
+```
+Root
+│   app.py
+│
+├───api
+│       api.py
+│       __init__.py
+│
+└───client
+    │   client.py
+    │   __init__.py
+    │
+    ├───static
+    │       index.js
+    │
+    └───templates
+            index.html
+```
+ 
+
+
 And that's it! Run our new webapp/api with `flask run` and you should be greeted twice:
 once by Vue itself, and again by a response from your Flask API.
 
