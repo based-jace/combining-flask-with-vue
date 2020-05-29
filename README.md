@@ -335,7 +335,9 @@ Looking at the code, we're `await`ing a response to our API's 'greeting' endpoin
 `flaskGreeting` variable to the returned JSON object's value for its `greeting` key.
 
 *For those unfamiliar with JavaScript's relatively new `Fetch` API, it's basically a native AXIOS killer
-(at least as far as the client-side is concerned -- it is not supported by Node, but it will be by Deno).*
+(at least as far as the client-side is concerned -- it is not supported by Node, but it will be by Deno).
+Additionally, if you're like consistency, you can also check out this library: 
+https://www.npmjs.com/package/isomorphic-fetch in order to use Fetch on the server-side.*
 
 And we're finished. Now because, again, our front-end and back-end are separate,
 we'll need to run both of our apps separately. 
