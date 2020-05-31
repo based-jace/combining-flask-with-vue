@@ -8,6 +8,10 @@ their best use cases, and how to set each of them up.
 1. Python v3.8
 2. Flask v1.1
 
+*Things you should already know:*
+* How to use Flask
+* How to use vue-cli
+
 ## Overview
 1\) Importing Vue into Jinja templates
 
@@ -63,7 +67,7 @@ def index():
     return render_template("index.html", **{'greeting': 'Hello from Flask!'})
 ```
 
-We only need to import Flask and render_template from flask. 
+We only need to import `Flask` and `render_template` from `flask`. 
 
 The `greeting` variable will come up again in a second. 
 We're going to use it to show how to render variables with both Jinja and Vue in the same file.
@@ -73,8 +77,12 @@ In the body of our HTML file, create a container div with an id of `vm`
 (it can actually be anything, but this will make it consistent with Vue's JavaScript object naming standard).
 
 Within the div, create two `p` tags. These are going to contain placeholders for our Flask and Vue variables.
+
 One of the divs should contain the word 'greeting' surrounded by braces: `{{ greeting }}`.\
 The other should contain 'greeting' surrounded by brackets: `[[ greeting ]]`.
+
+If you don't use separate delimiters, with the default setup Flask will replace both greetings with whatever
+variable you pass with it (i.e. "Hello from Flask!").
 
 Here's what we have so far:
 
@@ -112,8 +120,8 @@ Create a new JavaScript file: `index.js`.
 In this file, we'll create our Vue context. Because it's already imported, we don't have to do it again here.
 We're going to set our instance's `el` as `'#vm'` and `delimiters` as '[[' and ']]'.
 
-In reality, we can use anything we want as our delimiters. In fact, if it's your preference, you can change the
-delimiters for your Jinja templates in Flask instead if you'd like. I just find this much simpler.
+*In reality, we can use anything we want as our delimiters. In fact, if it's your preference, you can change the
+delimiters for your Jinja templates in Flask instead if you'd like. I just find this much simpler.*
 
 ```javascript
 const vm = new Vue({ // Again, vm is our Vue instance's name for consistency.
@@ -122,7 +130,7 @@ const vm = new Vue({ // Again, vm is our Vue instance's name for consistency.
 })
 ```
 
-Finally, we're also going to add a data element `greeting` as `'Hello, Vue!'`:
+Finally, we're also going to add a data element with the key/value of `greeting`: `'Hello, Vue!'`:
 
 ```javascript
 const vm = new Vue({ // Again, vm is our Vue instance's name for consistency.
@@ -189,8 +197,172 @@ you could easily set up any other number of front-ends to interact with your Fla
 *Additional Dependencies:*
 1. npm v6.15
 2. vue v2.6
+3. Flask-Cors v3.0
+
+*Note: Deployment and containerization are outside of the scope of this post,
+but it's not terribly difficult to Dockerize this setup*
 
 ### Setup
+
+Because we're completely separating Vue from Flask, this method requires a bit more setup.
+We're also going to need to enable Cross-Origin Resource Sharing (CORS) in Flask, since
+our back-end and front-end are going to be served on separate ports. To accomplish this quickly
+and easily, we're going to be using the Flask-Cors Python package.
+
+*For security reasons, modern web browsers do not allow client-side JavaScript to access resources
+(such as JSON data) from an origin differing from the origin your script is on 
+unless they include a specific response header letting the browser know it's okay.*
+
+If you haven't yet installed Flask-Cors, do so with pip. 
+
+Let's start with our Flask API.
+
+First, create a folder to hold the code for your project. 
+Inside, create a folder called `api`.
+
+Go into the folder, and create an `app.py` file.
+Open the file with your favorite text editor. This time we'll need to import `Flask` from `flask`
+and `CORS` from `flask_cors`. 
+
+Our `app.py` file for this method is going to look a bit simpler than in the last method. 
+
+Next, we'll create our Flask app object: `app = Flask(__name__)`.
+Because we're using `flask_cors` to enable cross-origin resource sharing,
+we're next going to wrap our app object (without setting a new variable) with `CORS`: `CORS(app)`.
+That's all we have to do to enable CORS on all of our routes for any origin.
+
+*Note: Although this is fine for demonstration purposes, you probably aren't going to want just
+any app or website to be able to access your API. In that case you can use the kwarg 'origins'
+with the CORS function to add a list of acceptable origins. i.e. `CORS(app, origins=["origin1", "origin2"])`*
+
+Lastly, we're going to create a single greeting route at `/greeting` to return a JSON object with a single key/value:
+`{'greeting': 'Hello from Flask!'}`.
+
+Here's what we should have ended up with:
+
+```python
+from flask import Flask
+from flask_cors import CORS
+
+app = Flask(__name__)
+CORS(app)
+
+@app.route("/greeting")
+def greeting():
+    return {'greeting': 'Hello from Flask!'}
+```
+
+That's all we need to do with Python.
+
+Next, we'll set up our Vue webapp. From a terminal, open your project's root folder.
+Using vue-cli, create a vue project called "webapp" (`vue create webapp`). You can use pretty much
+whatever options you like, though if you're using class-based components in typescript,
+the syntax will look a bit different.
+
+When your project is finished being created, go into its folder. Change into `src`, then open `App.vue`.
+
+Since we're just seeing how Vue and Flask can interact with each other, at the top of the page,
+delete all elements within the div with the id of `app`. You should just be left with:
+
+```html
+<template>
+<div id="app">
+</div>
+</template>
+```
+
+Within `#app`, create two `p` elements. The content of the first should be `{{ greeting }}`.\
+The content of the second should be `{{ flaskGreeting }}`.
+
+Your final HTML should be as such:
+```html
+<template>
+<div id="app">
+    <p>{{ greeting }}</p>
+    <p>{{ flaskGreeting }}</p>
+</div>
+</template>
+```
+
+In our `script`, we're going to add logic to show a purely client-side greeting (`greeting`)
+and a greeting pulled from our API (`flaskGreeting`).
+
+Within our Vue object (it begins with `export default`), create a `data` key. Make it a function that returns an object.
+Within this object, create two more keys: `greeting` and `flaskGreeting`. `greeting`'s value should just be "Hello, Vue!".
+You can give `flaskGreeting` anything you want (this will be overwritten asynchronously).
+
+Here's what we have so far:
+```javascript
+export default {
+    name: 'App',
+    components: {
+        HelloWorld
+    },
+    data: function(){
+        return {
+            greeting: 'Hello, Vue!',
+            flaskGreeting: ""
+        }
+    }
+}
+```
+
+Finally, let's give our Vue object a `created` lifecycle hook. This hook will only be run once the DOM is loaded
+and our Vue object is created. This allows us to use the DOM, the `fetch` API, and interact with Vue without anything
+clashing:
+
+```javascript
+export default {
+	components: {
+		Logo
+	},
+	data: function(){
+		return {
+			greeting: 'Hello, Vue!',
+			flaskGreeting: ''
+		}
+	},
+	created: async function(){
+		const gResponse = await fetch("http://localhost:5000/greeting");
+		const gObject = await gResponse.json();
+		this.flaskGreeting = gObject.greeting;
+	}
+}
+```
+
+Looking at the code, we're `await`ing a response to our API's 'greeting' endpoint (`http://localhost:5000/greeting`),
+`await`ing that response's asynchronous `.json()` response, and setting our Vue object's
+`flaskGreeting` variable to the returned JSON object's value for its `greeting` key.
+
+*For those unfamiliar with JavaScript's relatively new `Fetch` API, it's basically a native AXIOS killer
+(at least as far as the client-side is concerned -- it is not supported by Node, but it will be by Deno).
+Additionally, if you're like consistency, you can also check out this library: 
+https://www.npmjs.com/package/isomorphic-fetch in order to use Fetch on the server-side.*
+
+And we're finished. Now because, again, our front-end and back-end are separate,
+we'll need to run both of our apps separately. 
+
+Let's open our project's root folder in two separate folders. 
+In the first, we're going to change into our `api` directory, then run `flask run`.
+If all goes well, our Flask API should be running.
+
+In our second terminal, we'll change into our `webapp` directory, then run `npm run serve`.
+
+Once our web app is up, we should be able to access it from `localhost:8080`. If
+everything works, you should be greeted twice: Once by Vue, and again from your Flask API.
+
+Your final file tree should look like:
+
+```
+Root
+│   app.py
+│
+├───api
+│       app.py
+│
+└───webapp
+        ... {{ Vue project }}
+```
 
 ## 2.5) Complete Separation of Flask and a Vue Single-Page Application (SPA) with Server-Side Rendering (SSR) using Nuxt
 
@@ -199,12 +371,14 @@ If SEO is as important to you as UX, you're going to want to implement SSR in so
 SSR makes it easier for search engines to navigate and index your web app, as you'll be able to give them
 a form of your web app that doesn't require JavaScript to generate it. 
 
-*Note: A Single-Page App with Server-Side Rendering is also called a Univeral App. *
+*Note: A Single-Page App with Server-Side Rendering is also called a Univeral App.*
 
 Although it's possible to implement SSR manually, we'll be using Nuxt in this tutorial; it greatly simplifies things. 
 
 Just like in Method 2, your front-end and back-end will be completely separate, 
 only you'll be using Nuxt instead of vue-cli.
+
+*Note: Although you can manually manage server-side rendering without Nuxt, it makes it a lot easier*
 
 ### Pros
 * All of the pros of method 2 with the addition of Server-Side Rendering
@@ -219,9 +393,85 @@ only you'll be using Nuxt instead of vue-cli.
 *Additional Dependencies:*
 1. npm v6.15
 2. vue v2.6
-3. nuxt v2.12
 
 ### Setup
+
+This is going to be very similar to the last method. Follow along with its setup until
+you have created your API.
+
+Once your API is finished, within a terminal, 
+`cd` into your root folder and run the command `npx create-nuxt-app webapp`.
+This will let you interactively generate a nuxt project without installing anything globally.
+
+Again, any options should be fine here. 
+
+Once your project is done being generated, dive into your new `webapp` folder. Go into `pages`,
+then open `index.vue`. Similarly to method 2, delete everything within the `div` that has the class
+`container`. Inside, create two `p` tags with the same vars as the last method:\
+`{{ greeting }}` and `{{ flaskGreeting }}`
+
+It should look like this:
+
+```html
+<template>
+  <div class="container">
+    <p>{{ greeting }}</p>
+	<p>{{ flaskGreeting }}</p>
+  </div>
+</template>
+```
+
+And now for our script. We're going to do the same thing as the last method:
+* Add a `data` key that returns an object with the variables `greeting` and `flaskGreeting`
+* Add a `created` lifecycle hook with the same code as in method 2
+  * `await` `fetch` to get the JSON greeting from our API (on port 5000 unless you changed it)
+  * `await` the `json()` method to asynchronously get our JSON data from our API's response
+  * Set our Vue instance's `flaskGreeting` to the `greeting` key from our response's JSON object
+
+Minus the missing `name` and a different generated component, our Vue object should look the same:
+
+```javascript
+export default {
+	components: {
+		Logo
+	},
+	data: function(){
+		return {
+			greeting: 'Hello, Vue!',
+			flaskGreeting: ''
+		}
+	},
+	created: async function(){
+		const gResponse = await fetch("http://localhost:5000/greeting");
+		const gObject = await gResponse.json();
+		this.flaskGreeting = gObject.greeting;
+	}
+}
+```
+
+Running our app and api is going to be very similar to the last method as well.
+Open two terminals. With the first, change into `api` and run the command `run flask`.
+With the second, change into `webapp`, but this time run `npm run dev` to start
+a development server for your Nuxt project. 
+
+*In production you can either run 
+`npm run build`, then `npm run start` to start a production server,
+or you can actually generate a static app using `npm run generate` and host the output.*
+
+Nuxt defaults to using port `3000` instead of `8080`.
+
+Our final tree:
+
+```
+Root
+│   app.py
+│
+├───api
+│       app.py
+│
+└───webapp
+        ... {{ Nuxt project }}
+```
 
 ## 3) Partial separation using Flask blueprints
 
@@ -266,8 +516,8 @@ they will be distinctly separated.
 
 We'll come back to this later.
 
-Let's dive into our `api` folder. Create a file called `api.py`. This we'll contain all of the code associated
-with our API Additionally, because we will be accessing this file/folder as a module, create an `__init__.py`.
+Let's dive into our `api` folder. Create a file called `api.py`. This will contain all of the code associated
+with our API. Additionally, because we will be accessing this file/folder as a module, create an `__init__.py` file.
 
 Because we're going to be working with blueprints, this is going to look a lot like creating a regular Flask app,
 only we're importing and using `Blueprint` from `flask` instead of `Flask`:
@@ -285,7 +535,7 @@ def greeting():
 Blueprint's first argument is for Flask's routing system. The second, `__name__`,
 is equivalent to a Flask app's first argument.
 
-And that's it with our API blueprint. Super simple, right?
+And that's it with our API blueprint.
 
 Okay. Let's go back up, then dive into the `client` folder we created earlier. 
 This one's going to be a little more involved than our API blueprint, 
@@ -301,8 +551,8 @@ Like our `api.py` file, we create a `Blueprint` variable. In this case, we're ca
 
 This time, though, we have to pass in a few more arguments. 
 Regular Flask apps are smart enough to know where our `templates` and `static` folders are,
-but Flask blueprints do not. We'll also have to tell it where our blueprint's `static` endpoint should be.
-Intuitively, this is because if we have multiple blueprints and we have one or more `static` folders that have
+but Flask blueprints are not. We'll also have to tell it where our blueprint's `static` endpoint should be.
+Intuitively, this is because if we have multiple blueprints and one or more `static` folders that have
 files of the same name in them, Flask will be confused and not know which file to serve.
 
 Visually, here's what it should look like:
@@ -315,7 +565,7 @@ client_bp = Blueprint('client_bp', __name__, # 'Client Blueprint'
 )
 ```
 
-Route "/" to render `index.html` (we're about to create it) on our new blueprint.
+We'll then route "/" to render `index.html` (we're about to create it) on our new blueprint.
 
 Here's what our file should end up looking like:
 
@@ -334,7 +584,7 @@ def index():
 ```
 
 Excellent. Our client blueprint is now finished. Exit the file, go into the blueprint's `templates` folder,
-and create an `index.html` with a `<body>` that is identical to the one we created in method 1, scripts and all:
+and create an `index.html` with an html `body` that is identical to the one we created in method 1, scripts and all:
 
 ```html
 <body>
@@ -350,6 +600,9 @@ and create an `index.html` with a `<body>` that is identical to the one we creat
 
 Now, since we're going to do all of our actual data/component rendering from Vue, replace
 `{{ greeting }}` with `[[ greeting ]]` and the next line's `[[ greeting ]]` with `[[ flaskGreeting ]]`.
+
+*If you noticed we're using brackets instead of braces, 
+it's because we need to change our delimiters again to keep Flask from catching them first.*
 
 The first line will be rendered by Vue as soon as it's ready, 
 while the second line will be taken from a Flask response that we'll request asynchronously.
@@ -394,34 +647,9 @@ const vm = new Vue({
 ```
 
 Because we're also going to pull a greeting from our API, create a data placeholder called 'flaskGreeting'.
-Give it a value of anything you want. I'm giving mine `'flaskGreeting'` (this will be quickly replaced anyway).
+Give it a value of anything you want. I'm giving mine the empty string: `''` (this will be quickly replaced anyway).
 
 Let's give our Vue object a `created` lifecycle hook. Let's also make it asynchronous:
-
-```javascript
-const vm = new Vue({
-    el: '#vm',
-    delimiters: ['[[', ']]'],
-    data: {
-        greeting: 'Hello, Vue!',
-        flaskGreeting: 'flaskGreeting'
-    },
-    created: async function(){
-        const gResponse = await fetch(apiEndpoint + 'greeting');
-        const gObject = await gResponse.json();
-        this.flaskGreeting = gObject.greeting;
-    }
-})
-```
-
-Looking at the code, we're `await`ing a response to our API's 'greeting' endpoint (`/api_v1/greeting`),
-`await`ing that response's asynchronous `.json()` response, and setting our Vue object's
-`flaskGreeting` variable to the returned JSON object's value for its `greeting` key.
-
-*For those unfamiliar with JavaScript's relatively new `Fetch` API, it's basically a native AXIOS killer
-(at least as the client-side is concerned -- it's not supported by Node, but it will be by Deno).*
-
-Altogether:
 
 ```javascript
 const apiEndpoint = '/api_v1/';
@@ -431,7 +659,7 @@ const vm = new Vue({
     delimiters: ['[[', ']]'],
     data: {
         greeting: 'Hello, Vue!',
-        flaskGreeting: 'flaskGreeting'
+        flaskGreeting: ''
     },
     created: async function(){
         const gResponse = await fetch(apiEndpoint + 'greeting');
@@ -441,11 +669,16 @@ const vm = new Vue({
 })
 ```
 
-Excellent. Only one thing left to do: let's put everything together in that initial `app.py` file we created
-at the beginning of this method.
+Looking at the code, we're `await`ing a response from our API's 'greeting' endpoint (`/api_v1/greeting`),
+`await`ing that response's asynchronous `.json()` response, and setting our Vue object's
+`flaskGreeting` variable to the returned JSON object's value for its `greeting` key. It's
+basically a mashup between the Vue objects from methods 1 and 2.
 
-Go back to our project's route folder and open the file. All we need from `flask` is `Flask`. 
-But this time, since we're using blueprints, we'll need to import them too 
+Excellent. Only one thing left to do: let's put everything together in that initial `app.py` file we created
+at the beginning.
+
+Go back to our project's root folder and open the file. All we need from `flask` is `Flask`. 
+But this time, since we're using blueprints, we'll also need to import those
 (using Python module syntax) so Flask knows to use them:
 
 ```python
@@ -456,7 +689,9 @@ from client.client import client_bp
 
 Create a Flask app as you would normally, but don't create any routes (not that you aren't allowed to,
 we just don't need any for our purposes as we'll just be using the routes from our blueprints).
-Instead, we're just going to register our blueprints using `app.register_blueprint`.
+Instead, we're just going to register our blueprints using `app.register_blueprint()`.
+
+*I gave my API blueprint a url_prefix to ensure all of its routes would be accessed after 'api_v1'*
 
 Our final `app.py` should look like:
 
@@ -489,25 +724,11 @@ Root
     └───templates
             index.html
 ```
- 
 
-
-And that's it! Run our new webapp/api with `flask run` and you should be greeted twice:
+And that's it! If you run your new webapp/api with `flask run` you should be greeted twice:
 once by Vue itself, and again by a response from your Flask API.
 
 ## Summary
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+There are many, many different ways to build a web app using Vue and Flask.
+Hopefully this gives you an idea about how to build yours.
