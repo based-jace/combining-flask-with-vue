@@ -2,7 +2,8 @@ Depending on your project's requirements, there are a few different ways to buil
 and they each involve various levels of back-end/front-end separation.
 
 In this tutorial we will take a look at three of them by analyzing the pros and cons of each, 
-their best use cases, and how to set each of them up.
+their best use cases, and how to set each of them up:
+![Different Ways to Build a Web App with Flask and Vue](https://user-images.githubusercontent.com/32235747/83411003-07ab7b00-a3dd-11ea-9352-9f33b7b6e98a.png)
 
 *Dependencies:*
 1. Python v3.8
@@ -188,8 +189,8 @@ If you want to build a fully dynamic web app with a seamless User Experience (UX
 your Flask back-end from your Vue front-end. This may take learning a whole new way of thinking when it comes
 to web app design if you're not familiar with modern front-end frameworks. 
 
-In the past, you would take a big hit to SEO if your site was a SPA, but updates
-to how Googlebot indexes sites has negated this at least somewhat
+Developing your app as a SPA may put a dent in your SEO. In the past this hit would be much more dramatic, but updates
+to how Googlebot indexes sites have negated this at least somewhat
 (it may, however, still have a greater impact on non-Google search engines that don't render JavaScript 
 or those that snapshot your page(s) too early - the latter shouldn't happen if your website is well-optimized).
 
@@ -397,7 +398,7 @@ Root
 ### Method Overview
 If SEO is as important to you as UX, you might want to implement SSR in some format. 
 SSR makes it easier for search engines to navigate and index your web app, as you'll be able to give them
-a form of your web app that doesn't require JavaScript to generate it. 
+a form of your web app that doesn't require JavaScript to generate. 
 It can also make it quicker for users to interact with your app, 
 as much of your initial content will be rendered before it's sent to your user.
 In other words, your user is not having to wait for all of your content to load asynchronously.
@@ -509,7 +510,7 @@ I mentioned the benefits of SEO earlier in this post, but just to show you what 
 I ran both web apps as-is, and grabbed the Lighthouse SEO scores for both.
 
 With no changes to either app, here's what we have:
-
+![Lighthouse SEO Scores for our Vue and Nuxt Spps](https://user-images.githubusercontent.com/32235747/83411025-12661000-a3dd-11ea-924a-b992673ddb08.png)
 
 Again, there are things you can do to improve your pure Vue SEO score.
 Lighthouse in Chrome's dev tools mention adding a meta description and a valid robots.txt, but
