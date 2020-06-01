@@ -22,7 +22,7 @@ export default {
     created: async function(){
         const gResponse = await fetch("http://localhost:5000/greeting");
         const gObject = await gResponse.json();
-        this.setFlaskGreeting = gObject.greeting;
+        this.flaskGreeting = gObject.greeting;
     }
 }
 </script>

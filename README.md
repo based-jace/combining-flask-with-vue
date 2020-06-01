@@ -35,6 +35,8 @@ while setting up and routing Flask as you would normally.
 ### Pros
 * You can build your app your way instead of fitting it around Vue's foundation
 * Search Engine Optimization (SEO) doesn't require any additional configuring
+* You can take advantage of cookie-based authentication instead of token-based authentication.
+This tends to be easier, as you're not dealing with asynchronous front-end/back-end communication
 
 ### Cons
 * You have to import Vue on and set up each page individually -
@@ -46,7 +48,7 @@ this will make a true Single-Page Application (SPA) difficult at the very least
 (as opposed to a Single-Page Application with its own Dynamic Routing - see method 2 for more info)
 * Building functionality onto an already existing web app
 * Adding bits of reactivity to an app without fully committing to a front-end framework
-* Projects that don't need the functionality/headache of a backend
+* Web apps that don't need to communicate as frequently to a back-end via AJAX
 
 *Additional Dependencies:*
 
@@ -167,17 +169,39 @@ write a tiny JavaScript library that will asynchronously grab html pages/element
 I've actually done this before, but it's a big hassle, and it's honestly not worth it --
 especially considering JavaScript will not run script tags imported this way.
 
+*If you'd like to check out my implementation of this method, you can find it on 
+[my github](https://github.com/based-jace/load-script-async).
+The library takes a given chunk of HTML and replaces the specified HTML on the page with it.
+If the given HTML contains no `<script>` elements (it checks using regex), it simply uses HTMLElement.innerHTML
+to replace it. If it does contain `<script>` elements, it recursively adds the nodes, 
+recreating any `<script>` nodes that come up, allowing your JavaScript to run.*
+
+*Using something like this in combination with the History API can help you build a small SPA with a very tiny
+file size. You can even create your own Server-Side Rendering functionality by serving full HTML pages
+when arriving at your site initially, but serving partial pages if through an AJAX request. 
+You can learn more about Server-Side Rendering in methods 2 and 2.5.*
+
 ## 2) Complete Separation of Flask and a Vue Single-Page Application (SPA)
 
 ### Method Overview
 If you want to build a fully dynamic web app with a seamless User Experience (UX), you can completely separate 
 your Flask back-end from your Vue front-end. This may take learning a whole new way of thinking when it comes
-to web app design if you're not familiar with modern front-end frameworks. Because all rendering is done 
-via JavaScript on the client-side, a huge dent will be put in your SEO. This side effect is negated 
-if you're building an in-house or similar app that does not necessitate SEO.
+to web app design if you're not familiar with modern front-end frameworks. 
 
-You will generate an app using vue-cli from npm. 
+In the past, you would take a big hit to SEO if your site was a SPA, but updates
+to how Googlebot indexes sites has negated this at least somewhat
+(it may, however, still have a greater impact on non-Google search engines that don't render JavaScript 
+or those that snapshot your page(s) too early - the latter shouldn't happen if your website is well-optimized).
+
+In this method, you will generate an app using vue-cli from npm. 
 You'll use Flask to create an Application Programming Interface (API) and send data requests to it from your Vue SPA.
+
+*For more information on SEO in modern SPAs, 
+[this post](https://medium.com/@l.mugnaini/spa-and-seo-is-googlebot-able-to-render-a-single-page-application-1f74e706ab11)
+on Medium shows how Googlebot indexes JavaScript-rendered sites.
+Additionally, [this post](https://www.smashingmagazine.com/2019/05/vue-js-seo-reactive-websites-search-engines-bots/)
+talks in-depth about the same thing along with other helpful tips, 
+such those concerning SEO on other search engines*
 
 ### Pros
 * Your back-end and front-end will be completely independent of each other - 
@@ -188,7 +212,9 @@ you could easily set up any other number of front-ends to interact with your Fla
 ### Cons
 * There is much more to set up and learn
 * Deployment could be a headache
-* SEO suffers without further intervention (see method 2.5 for more details)
+* SEO might suffer without further intervention (see method 2.5 for more details)
+* Authentication is much more involved, 
+as you'll have to keep passing your auth token (JWT or Paseto) to your back-end
 
 ### Best For
 * Apps where UX is more important than SEO
@@ -275,6 +301,7 @@ Within `#app`, create two `p` elements. The content of the first should be `{{ g
 The content of the second should be `{{ flaskGreeting }}`.
 
 Your final HTML should be as such:
+
 ```html
 <template>
 <div id="app">
@@ -292,6 +319,7 @@ Within this object, create two more keys: `greeting` and `flaskGreeting`. `greet
 You can give `flaskGreeting` anything you want (this will be overwritten asynchronously).
 
 Here's what we have so far:
+
 ```javascript
 export default {
     name: 'App',
@@ -367,9 +395,12 @@ Root
 ## 2.5) Complete Separation of Flask and a Vue Single-Page Application (SPA) with Server-Side Rendering (SSR) using Nuxt
 
 ### Method Overview
-If SEO is as important to you as UX, you're going to want to implement SSR in some format. 
+If SEO is as important to you as UX, you might want to implement SSR in some format. 
 SSR makes it easier for search engines to navigate and index your web app, as you'll be able to give them
 a form of your web app that doesn't require JavaScript to generate it. 
+It can also make it quicker for users to interact with your app, 
+as much of your initial content will be rendered before it's sent to your user.
+In other words, your user is not having to wait for all of your content to load asynchronously.
 
 *Note: A Single-Page App with Server-Side Rendering is also called a Univeral App.*
 
@@ -472,6 +503,31 @@ Root
 └───webapp
         ... {{ Nuxt project }}
 ```
+
+### BONUS: Vue vs Nuxt SEO Comparison
+I mentioned the benefits of SEO earlier in this post, but just to show you what I meant,
+I ran both web apps as-is, and grabbed the Lighthouse SEO scores for both.
+
+With no changes to either app, here's what we have:
+
+
+Again, there are things you can do to improve your pure Vue SEO score.
+Lighthouse in Chrome's dev tools mention adding a meta description and a valid robots.txt, but
+with no additional intervention, Nuxt gave us a perfect SEO score.
+
+Additionally, you can actually physically see the difference between the SSR that Nuxt does and
+vanilla Vue's completely asynchronous approach. If you run both apps at the same time, 
+then go to their respective origins, localhost:8080 and localhost:3000,
+the Vue app's initial greeting happens milliseconds after you get the response,
+whereas Nuxt's is served with its initial greeting already-rendered.
+
+Lastly, one more really cool thing you can do with Nuxt, if it's relevant to your web app,
+is to generate a pre-rendered static version of your app that can be served anywhere 
+(such as [Netlify](https://www.netlify.com/)) without needing a dedicated Node server as a middle-man.
+
+For more information on the differences between Nuxt and Vue, you can check out
+[these](https://www.bornfight.com/blog/nuxt-js-over-vue-js-when-should-you-use-it-and-why/)
+[posts](https://blog.logrocket.com/how-nuxt-js-solves-the-seo-problems-in-vue-js/).
 
 ## 3) Partial separation using Flask blueprints
 
