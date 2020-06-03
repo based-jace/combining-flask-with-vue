@@ -23,10 +23,10 @@ Depending on your project's requirements, there are a few different ways to buil
 
 In this post, we'll take a look at three different methods for combining Flask and Vue:
 
-1\. Import Vue into a Jinja template\
-2\. Complete Separation of Flask and a Vue Single-Page Application (SPA)\
-2\.5. Complete Separation of Flask and a Vue SPA with Server-Side Rendering (SSR) using Nuxt\
-3\. Partial separation using Flask blueprints
+1. Import Vue into a Jinja template
+2. Complete Separation of Flask and a Vue Single-Page Application (SPA)
+2.5. Complete Separation of Flask and a Vue SPA with Server-Side Rendering (SSR) using Nuxt
+3. Partial separation using Flask blueprints
 
 ![Different Ways to Build a Web App with Flask and Vue](https://user-images.githubusercontent.com/32235747/83411003-07ab7b00-a3dd-11ea-9352-9f33b7b6e98a.png)
 
