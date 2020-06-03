@@ -471,7 +471,7 @@ I mentioned the benefits of SEO earlier in this post, but just to show you what 
 With no changes to either app, here's what we have:
 ![Lighthouse SEO Scores for our Vue and Nuxt Apps](https://user-images.githubusercontent.com/32235747/83606977-11012880-a540-11ea-9a11-e89703395e6d.png)
 
-Again, there are things you can do to improve your pure Vue SEO score. Lighthouse in Chrome's dev tools mention adding a meta description, but with no additional intervention, Nuxt gave us a perfect SEO score.
+Again, there are things you can do to improve your pure Vue SEO score. Lighthouse in Chrome's dev tools mentions adding a meta description, but with no additional intervention, Nuxt gave us a perfect SEO score.
 
 Additionally, you can actually see the difference between the SSR that Nuxt does and vanilla Vue's completely asynchronous approach. If you run both apps at the same time, navigate to their respective origins, `localhost:8080` and `localhost:3000`, the Vue app's initial greeting happens milliseconds after you get the response, whereas Nuxt's is served with its initial greeting already-rendered.
 
