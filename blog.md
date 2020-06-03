@@ -23,10 +23,10 @@ Depending on your project's requirements, there are a few different ways to buil
 
 In this post, we'll take a look at three different methods for combining Flask and Vue:
 
-1. Import Vue into a Jinja template
-2. Complete Separation of Flask and a Vue Single-Page Application (SPA)
-2.5. Complete Separation of Flask and a Vue SPA with Server-Side Rendering (SSR) using Nuxt
-3. Partial separation using Flask blueprints
+1\. Import Vue into a Jinja template\
+2\. Complete Separation of Flask and a Vue Single-Page Application (SPA)\
+2\.5. Complete Separation of Flask and a Vue SPA with Server-Side Rendering (SSR) using Nuxt\
+3\. Partial separation using Flask blueprints
 
 ![Different Ways to Build a Web App with Flask and Vue](https://user-images.githubusercontent.com/32235747/83411003-07ab7b00-a3dd-11ea-9352-9f33b7b6e98a.png)
 
@@ -182,7 +182,7 @@ That's it! Method 1 is done. You can mix and match JSON endpoints and HTML endpo
 
 With each additional HTML page, you'll have to either import the same JS file and account for variables and elements that may not apply to it or create a new Vue object for each page. A true SPA will be difficult, but not impossible -- theoretically you could write a tiny JavaScript library that will asynchronously grab html pages/elements served by Flask.
 
-> I've actually created my on JavaScript library for this before. It was big hassle and honestly not worth it, especially considering JavaScript will not run script tags imported this way.
+> I've actually created my on JavaScript library for this before. It was a big hassle and honestly not worth it, especially considering JavaScript will not run script tags imported this way.
 > If you'd like to check out my implementation of this method, you can find it on [GitHub](https://github.com/based-jace/load-script-async). The library takes a given chunk of HTML and replaces the specified HTML on the page with it. If the given HTML contains no `<script>` elements (it checks using regex), it simply uses `HTMLElement.innerHTML` to replace it. If it does contain `<script>` elements, it recursively adds the nodes, recreating any `<script>` nodes that come up, allowing your JavaScript to run.
 > Using something like this in combination with the History API can help you build a small SPA with a very tiny file size. You can even create your own Server-Side Rendering functionality by serving full HTML pages when arriving at your site initially, but serving partial pages if through an AJAX request. You can learn more about Server-Side Rendering in methods 2 and 2.5.
 
@@ -190,7 +190,7 @@ With each additional HTML page, you'll have to either import the same JS file an
 
 If you want to build a fully dynamic web app with a seamless User Experience (UX), you can completely separate your Flask back-end from your Vue front-end. This may take learning a whole new way of thinking when it comes to web app design if you're not familiar with modern front-end frameworks.
 
-Developing your app as a SPA may put a dent in your SEO. In the past, this hit would be much more dramatic, but updates to how Googlebot indexes sites have negated this at least somewhat It may, however, still have a greater impact on non-Google search engines that don't render JavaScript or those that snapshot your page(s) too early -- the latter shouldn't happen if your website is well-optimized.
+Developing your app as a SPA may put a dent in your SEO. In the past, this hit would be much more dramatic, but updates to how Googlebot indexes sites have negated this at least somewhat. It may, however, still have a greater impact on non-Google search engines that don't render JavaScript or those that snapshot your page(s) too early -- the latter shouldn't happen if your website is well-optimized.
 
 > For more information on SEO in modern SPAs, [this post](https://medium.com/@l.mugnaini/spa-and-seo-is-googlebot-able-to-render-a-single-page-application-1f74e706ab11) on Medium shows how Googlebot indexes JavaScript-rendered sites. Additionally, [this post](https://www.smashingmagazine.com/2019/05/vue-js-seo-reactive-websites-search-engines-bots/) talks in-depth about the same thing along with other helpful tips, such those concerning SEO on other search engines.
 
@@ -264,7 +264,7 @@ Next, we'll set up our Vue webapp. From a terminal, open your project's root fol
 
 When your project is finished being created, go into its folder. Change into "src", and then open *App.vue*.
 
-Since our goal is just to see how Vue and Flask interacts with each other, at the top of the page, delete all elements within the div with the id of `app`. You should just be left with:
+Since our goal is just to see how Vue and Flask interact with each other, at the top of the page, delete all elements within the div with the id of `app`. You should just be left with:
 
 ```html
 <template>
@@ -405,10 +405,10 @@ It should look like this:
 
 ```html
 <template>
-  <div class="container">
+<div class="container">
     <p>{{ greeting }}</p>
-	  <p>{{ flaskGreeting }}</p>
-  </div>
+    <p>{{ flaskGreeting }}</p>
+</div>
 </template>
 ```
 
@@ -452,7 +452,7 @@ Hello, Vue!
 Hello from Flask!
 ```
 
-> In production you can either run `npm run build` and then `npm run start` to start a production server  or you can actually generate a static app using `npm run generate` and host the output.
+> In production you can run `npm run build` and then `npm run start` to start a production server.
 
 Our final tree:
 
@@ -469,13 +469,11 @@ Our final tree:
 I mentioned the benefits of SEO earlier in this post, but just to show you what I meant, I ran both web apps as-is, and grabbed the Lighthouse SEO scores for both.
 
 With no changes to either app, here's what we have:
-![Lighthouse SEO Scores for our Vue and Nuxt Apps](https://user-images.githubusercontent.com/32235747/83411025-12661000-a3dd-11ea-924a-b992673ddb08.png)
+![Lighthouse SEO Scores for our Vue and Nuxt Apps](https://user-images.githubusercontent.com/32235747/83606977-11012880-a540-11ea-9a11-e89703395e6d.png)
 
-Again, there are things you can do to improve your pure Vue SEO score. Lighthouse in Chrome's dev tools mention adding a meta description and a valid robots.txt, but with no additional intervention, Nuxt gave us a perfect SEO score.
+Again, there are things you can do to improve your pure Vue SEO score. Lighthouse in Chrome's dev tools mention adding a meta description, but with no additional intervention, Nuxt gave us a perfect SEO score.
 
 Additionally, you can actually see the difference between the SSR that Nuxt does and vanilla Vue's completely asynchronous approach. If you run both apps at the same time, navigate to their respective origins, `localhost:8080` and `localhost:3000`, the Vue app's initial greeting happens milliseconds after you get the response, whereas Nuxt's is served with its initial greeting already-rendered.
-
-Lastly, one more really cool thing you can do with Nuxt, if it's relevant to your web app, is to generate a pre-rendered static version of your app that can be served anywhere (such as [Netlify](https://www.netlify.com/)) without needing a dedicated Node server as a middle-man.
 
 For more information on the differences between Nuxt and Vue, you can check out [these](https://www.bornfight.com/blog/nuxt-js-over-vue-js-when-should-you-use-it-and-why/) [posts](https://blog.logrocket.com/how-nuxt-js-solves-the-seo-problems-in-vue-js/).
 
@@ -538,7 +536,7 @@ And that's it with our API blueprint.
 
 Okay. Let's dive into the "client" folder we created earlier. This one's going to be a little more involved than our API blueprint, but no more complicated than a regular Flask app.
 
-Again, like a regular Flask app, inside this folder, create a "static" folder and a "templates" folder. Create a file called *client.py* and open it your text editor.
+Again, like a regular Flask app, inside this folder, create a "static" folder and a "templates" folder. Create a file called *client.py* and open it in your text editor.
 
 This time, we'll pass in a few more arguments to our `Blueprint` so it knows where to find the correct static files and templates:
 

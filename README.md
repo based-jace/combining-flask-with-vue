@@ -487,8 +487,7 @@ With the second, change into `webapp`, but this time run `npm run dev` to start
 a development server for your Nuxt project. 
 
 *In production you can either run 
-`npm run build`, then `npm run start` to start a production server,
-or you can actually generate a static app using `npm run generate` and host the output.*
+`npm run build`, then `npm run start` to start a production server.*
 
 Nuxt defaults to using port `3000` instead of `8080`.
 
@@ -510,7 +509,8 @@ I mentioned the benefits of SEO earlier in this post, but just to show you what 
 I ran both web apps as-is, and grabbed the Lighthouse SEO scores for both.
 
 With no changes to either app, here's what we have:
-![Lighthouse SEO Scores for our Vue and Nuxt Spps](https://user-images.githubusercontent.com/32235747/83411025-12661000-a3dd-11ea-924a-b992673ddb08.png)
+![Lighthouse SEO Scores for our Vue and Nuxt Spps](https://user-images.githubusercontent.com/32235747/83606977-11012880-a540-11ea-9a11-e89703395e6d.png)
+
 
 Again, there are things you can do to improve your pure Vue SEO score.
 Lighthouse in Chrome's dev tools mention adding a meta description and a valid robots.txt, but
@@ -521,10 +521,6 @@ vanilla Vue's completely asynchronous approach. If you run both apps at the same
 then go to their respective origins, localhost:8080 and localhost:3000,
 the Vue app's initial greeting happens milliseconds after you get the response,
 whereas Nuxt's is served with its initial greeting already-rendered.
-
-Lastly, one more really cool thing you can do with Nuxt, if it's relevant to your web app,
-is to generate a pre-rendered static version of your app that can be served anywhere 
-(such as [Netlify](https://www.netlify.com/)) without needing a dedicated Node server as a middle-man.
 
 For more information on the differences between Nuxt and Vue, you can check out
 [these](https://www.bornfight.com/blog/nuxt-js-over-vue-js-when-should-you-use-it-and-why/)
