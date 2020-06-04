@@ -5,16 +5,16 @@ share: true
 toc: true
 permalink: combine-flask-vue
 type: blog
-author: Jace Medlin
-lastname: medlin
+author: Michael Herman
+lastname: herman
 description: In this post, we'll take a look at three different methods for combining Flask and Vue.
 keywords: "flask, vue, flask and vue, flask single page application, flask spa, flask vue"
 topics: "flask, vue, api"
-image: flask-vue/developing_spa_flask_vue.png
+image: combine-flask-vue/todo.png
 image_alt: flask and vue
-blurb: In this post, we'll take a look at three different methods for combining Flask and Vue.
-date: 2020-06-07
-modified_date: 2020-06-07
+blurb: Three different methods for combining Flask and Vue.
+date: 2020-06-05
+modified_date: 2020-06-05
 ---
 
 *How can I combine Vue.js with Flask?*
@@ -23,30 +23,19 @@ Depending on your project's requirements, there are a few different ways to buil
 
 In this post, we'll take a look at three different methods for combining Flask and Vue:
 
-1. Import Vue into a Jinja template
-2. Complete Separation of Flask and a Vue Single-Page Application (SPA)
-2.5. Complete Separation of Flask and a Vue SPA with Server-Side Rendering (SSR) using Nuxt
-3. Partial separation using Flask blueprints
+1. **Jinja Template**: Importing Vue into a Jinja template
+1. **Single-Page Application**: Building a Single-Page Application (SPA) to completely separate Flask and Vue
+1. **Flask Blueprint**: Serving up Vue from a Flask blueprint to partially separate the two
 
-![Different Ways to Build a Web App with Flask and Vue](https://user-images.githubusercontent.com/32235747/83411003-07ab7b00-a3dd-11ea-9352-9f33b7b6e98a.png)
+<img src="/static/images/blog/combine-flask-vue/methods_for_combining_flask_and_vue.png" style="max-width:100%;" alt="Different Ways to Build a Web App with Flask and Vue">
 
 We'll analyze the pros and cons of each method, look at their best use cases, and detail how to set each of them up.
-
-*Dependencies:*
-
-1. Python v3.8
-2. Flask v1.1
-
-*Things you should already know:*
-
-* How to use Flask
-* How to use vue-cli
 
 <h2 class="toc-header">Contents</h2>
 
 [TOC]
 
-## Import Vue into a Jinja template
+## Jinja Template
 
 Regardless of whether you're using React, Vue, or Angular, this is the easiest way to transition to using a front-end framework.
 
@@ -58,7 +47,7 @@ You can import the Vue library either through a Content Delivery Network (CDN) o
 
 * You can build your app your way instead of fitting it around Vue's foundation.
 * Search Engine Optimization (SEO) doesn't require any additional configuring.
-* You can take advantage of cookie-based authentication instead of token-based authentication. This tends to be easier, as you're not dealing with asynchronous front-end/back-end communication.
+* You can take advantage of cookie-based authentication instead of token-based authentication. This tends to be easier, as you're not dealing with asynchronous communication between the front and back end.
 
 ### Cons
 
@@ -66,14 +55,14 @@ You can import the Vue library either through a Content Delivery Network (CDN) o
 
 ### Best For
 
-* Small web apps literally using a single HTML page or two (as opposed to a SPA with its own Dynamic Routing - see method 2 for more info)
+* Small web apps literally using a single HTML page or two (as opposed to a SPA with its own Dynamic Routing -- see method 2 for more info)
 * Building functionality onto an already existing web app
 * Adding bits of reactivity to an app without fully committing to a front-end framework
 * Web apps that don't need to communicate as frequently to a back-end via AJAX
 
-*Additional Dependencies:*
+### Additional Dependencies
 
-Just requires adding the Vue library via a Content Delivery Network (CDN):
+This method just requires the Vue library, which you can add via a CDN:
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
@@ -99,9 +88,9 @@ We only need to import `Flask` and `render_template` from `flask`.
 
 The `greeting` variable will come up again in a second when we look at how to render variables with both Jinja and Vue in the same file.
 
-Next, create a "templates" folder to hold our HTML file. Inside of that folder, create *index.html*. In the body of our HTML file, create a container div with an id of `vm`.
+Next, create a "templates" folder to hold our HTML file. Inside of that folder, create an *index.html* file. In the body of our HTML file, create a container div with an id of `vm`.
 
-> It's worth noting, that `vm` is just a common naming standard. You can name it whatever you want; it does not need to be `vm`.
+> It's worth noting that `vm` is just a common naming standard. It stands for [ViewModel](https://012.vuejs.org/guide/#ViewModel). You can name it whatever you want; it does not need to be `vm`.
 
 Within the div, create two `p` tags to serve as placeholders for our Flask and Vue variables:
 
@@ -136,7 +125,7 @@ Before the end of the body tag, import Vue from the official CDN along with a sc
 </body>
 ```
 
-Navigating up a directory, create a "static" folder. Create a new JavaScript file in that folder called *index.js*.
+Navigating up a directory, create a "static" folder. Add a new JavaScript file in that folder called *index.js*.
 
 In this file, create the Vue context, set our instance's `el` as `'#vm'`, change the default delimiters from `'{{', '}}'` to `'[[', ']]'`:
 
@@ -147,9 +136,9 @@ const vm = new Vue({ // Again, vm is our Vue instance's name for consistency.
 })
 ```
 
-> In reality, we can use anything we want as our delimiters. In fact, if it's your preference, you can change the delimiters for your Jinja templates in Flask instead.
+> In reality, we can use anything we want as our delimiters. In fact, if it's your preference, you can [change](https://flask.palletsprojects.com/en/1.1.x/api/#flask.Flask.jinja_options) the delimiters for your Jinja templates in Flask instead.
 
-Finally, add a data element with the key/value of `greeting`: `'Hello, Vue!'`:
+Finally, add a data element with the key/value of `greeting: 'Hello, Vue!'`:
 
 ```javascript
 const vm = new Vue({ // Again, vm is our Vue instance's name for consistency.
@@ -180,32 +169,34 @@ Hello, Vue!
 
 That's it! Method 1 is done. You can mix and match JSON endpoints and HTML endpoints as you please, but be aware that this can get really ugly really quickly. For a more manageable alternative, see method 3.
 
-With each additional HTML page, you'll have to either import the same JS file and account for variables and elements that may not apply to it or create a new Vue object for each page. A true SPA will be difficult, but not impossible -- theoretically you could write a tiny JavaScript library that will asynchronously grab html pages/elements served by Flask.
+With each additional HTML page, you'll have to either import the same JavaScript file and account for variables and elements that may not apply to it or create a new Vue object for each page. A true SPA will be difficult, but not impossible -- theoretically you could write a tiny JavaScript library that will asynchronously grab HTML pages/elements served by Flask.
 
-> I've actually created my on JavaScript library for this before. It was a big hassle and honestly not worth it, especially considering JavaScript will not run script tags imported this way.
+> I've actually created my own JavaScript library for this before. It was big a hassle and honestly not worth it, especially considering JavaScript will not run script tags imported this way. You'll also be reinventing the wheel.
+>
 > If you'd like to check out my implementation of this method, you can find it on [GitHub](https://github.com/based-jace/load-script-async). The library takes a given chunk of HTML and replaces the specified HTML on the page with it. If the given HTML contains no `<script>` elements (it checks using regex), it simply uses `HTMLElement.innerHTML` to replace it. If it does contain `<script>` elements, it recursively adds the nodes, recreating any `<script>` nodes that come up, allowing your JavaScript to run.
-> Using something like this in combination with the History API can help you build a small SPA with a very tiny file size. You can even create your own Server-Side Rendering functionality by serving full HTML pages when arriving at your site initially, but serving partial pages if through an AJAX request. You can learn more about Server-Side Rendering in methods 2 and 2.5.
+>
+> Using something like this in combination with the History API can help you build a small SPA with a very tiny file size. You can even create your own Server-Side Rendering (SSR) functionality by serving full HTML pages on page load and then serve up partial pages through AJAX requests. You can learn more about SSR in method 2.
 
-## Complete Separation of Flask and a Vue SPA
+## Single-Page Application
 
 If you want to build a fully dynamic web app with a seamless User Experience (UX), you can completely separate your Flask back-end from your Vue front-end. This may take learning a whole new way of thinking when it comes to web app design if you're not familiar with modern front-end frameworks.
 
 Developing your app as a SPA may put a dent in your SEO. In the past, this hit would be much more dramatic, but updates to how Googlebot indexes sites have negated this at least somewhat. It may, however, still have a greater impact on non-Google search engines that don't render JavaScript or those that snapshot your page(s) too early -- the latter shouldn't happen if your website is well-optimized.
 
-> For more information on SEO in modern SPAs, [this post](https://medium.com/@l.mugnaini/spa-and-seo-is-googlebot-able-to-render-a-single-page-application-1f74e706ab11) on Medium shows how Googlebot indexes JavaScript-rendered sites. Additionally, [this post](https://www.smashingmagazine.com/2019/05/vue-js-seo-reactive-websites-search-engines-bots/) talks in-depth about the same thing along with other helpful tips, such those concerning SEO on other search engines.
+> For more information on SEO in modern SPAs, [this post](https://medium.com/@l.mugnaini/spa-and-seo-is-googlebot-able-to-render-a-single-page-application-1f74e706ab11) on Medium shows how Googlebot indexes JavaScript-rendered sites. Additionally, [this post](https://www.smashingmagazine.com/2019/05/vue-js-seo-reactive-websites-search-engines-bots/) talks in-depth about the same thing along with other helpful tips concerning SEO on other search engines.
 
 With this method, you'll want to generate a completely separate Vue app using the [Vue CLI](https://cli.vuejs.org/) tool. Flask will then be used to serve up a JSON RESTful API that your Vue SPA will communicate with via AJAX.
 
 ### Pros
 
-* Your back-end and front-end will be completely independent of each other, so you can make changes to one without it impacting the other. They can also be deployed, developed, and maintained separately. Finally, you can set up a number of other front-ends to interact with your Flask API.
+* Your front and back ends will be completely independent of each other, so you can make changes to one without it impacting the other. They can also be deployed, developed, and maintained separately. Finally, you can set up a number of other front-ends to interact with your Flask API.
 * Your front-end experience will be much smoother and more seamless.
 
 ### Cons
 
 * There is much more to set up and learn.
 * Deployment is difficult.
-* SEO might suffer without further intervention (see method 2.5 for more details).
+* SEO might suffer without further intervention (see the 'SPA with Nuxt' section for more details).
 * Authentication is much more involved, as you'll have to keep passing your auth token (JWT or Paseto) to your back-end.
 
 ### Best For
@@ -213,28 +204,25 @@ With this method, you'll want to generate a completely separate Vue app using th
 * Apps where UX is more important than SEO
 * Back-ends that need to be accessible by multiple front-ends
 
-*Additional Dependencies:*
+### Additional Dependencies
 
-1. Node/npm
-1. Vue CLI
-1. Flask-Cors
+* Node/npm
+* Vue CLI
+* Flask-CORS
 
 > Deployment and containerization are outside of the scope of this post, but it's not terribly difficult to Dockerize this setup to simplify deployment.
 
 ### Setup
 
-Because we're completely separating Vue from Flask, this method requires a bit more setup. We'll need to enable Cross-Origin Resource Sharing (CORS) in Flask, since our back-end and front-end will be served on separate ports. To accomplish this quickly and easily, we'll use the Flask-Cors Python package.
+Because we're completely separating Vue from Flask, this method requires a bit more setup. We'll need to enable Cross-Origin Resource Sharing (CORS) in Flask, since our front and back ends will be served on separate ports. To accomplish this quickly and easily, we'll use the [Flask-CORS](https://flask-cors.readthedocs.io/) Python package.
 
 > For security reasons, modern web browsers do not allow client-side JavaScript to access resources (such as JSON data) from an origin differing from the origin your script is on unless they include a specific response header letting the browser know it's okay.
 
-If you haven't yet installed Flask-Cors, do so with pip.
+If you haven't yet installed Flask-CORS, do so with pip.
 
 Let's start with our Flask API.
 
-First, create a folder to hold the code for your project. Inside, create a folder called "api".
-
-Go into the folder, and create an *app.py* file. Open the file with your favorite text editor. This time we'll need to import `Flask` from `flask`
-and `CORS` from `flask_cors`. Because we're using `flask_cors` to enable cross-origin resource sharing, wrap the app object (without setting a new variable) with `CORS`: `CORS(app)`. That's all we have to do to enable CORS on all of our routes for any origin.
+First, create a folder to hold the code for your project. Inside, create a folder called "api". Create an *app.py* file in the folder. Open the file with your favorite text editor. This time we'll need to import `Flask` from `flask` and `CORS` from `flask_cors`. Because we're using `flask_cors` to enable cross-origin resource sharing, wrap the app object (without setting a new variable) with `CORS`: `CORS(app)`. That's all we have to do to enable CORS on all of our routes for any origin.
 
 > Although this is fine for demonstration purposes, you probably aren't going to want just any app or website to be able to access your API. In that case you can use the kwarg 'origins' with the CORS function to add a list of acceptable origins -- i.e., `CORS(app, origins=["origin1", "origin2"])`
 
@@ -260,9 +248,9 @@ def greeting():
 
 That's all we need to do with Python.
 
-Next, we'll set up our Vue webapp. From a terminal, open your project's root folder. Using the Vue CLI, create a vue project called "webapp" (`vue create webapp`). You can use pretty much whatever options you like, but if you're using class-based components in TypeScript, the syntax will look a bit different.
+Next, we'll set up our Vue webapp. From a terminal, open your project's root folder. Using the Vue CLI, create a Vue project called "webapp" (`vue create webapp`). You can use pretty much whatever options you like, but if you're using class-based components in TypeScript, the syntax will look a bit different.
 
-When your project is finished being created, go into its folder. Change into "src", and then open *App.vue*.
+When your project is finished being created, open *App.vue*.
 
 Since our goal is just to see how Vue and Flask interact with each other, at the top of the page, delete all elements within the div with the id of `app`. You should just be left with:
 
@@ -291,7 +279,7 @@ Your final HTML should be as such:
 
 In our `script`, let's add logic to show a purely client-side greeting (`greeting`) and a greeting pulled from our API (`flaskGreeting`).
 
-Within the Vue object (it begins with `export default`), create a `data` key. Make it a function that returns an object. Then, within this object, create two more keys: `greeting` and `flaskGreeting`. `greeting`'s value should be "Hello, Vue!" while `flaskGreeting`'s should be an empty string.
+Within the Vue object (it begins with `export default`), create a `data` key. Make it a function that returns an object. Then, within this object, create two more keys: `greeting` and `flaskGreeting`. `greeting`'s value should be `'Hello, Vue!'` while `flaskGreeting`'s should be an empty string.
 
 Here's what we have this far:
 
@@ -333,15 +321,15 @@ export default {
 
 Looking at the code, we're `await`ing a response to our API's 'greeting' endpoint (`http://localhost:5000/greeting`), `await`ing that response's asynchronous `.json()` response, and setting our Vue object's `flaskGreeting` variable to the returned JSON object's value for its `greeting` key.
 
-> For those unfamiliar with JavaScript's relatively new `Fetch` API, it's basically a native AXIOS killer (at least as far as the client-side is concerned -- it is not supported by Node, but it will be by Deno). Additionally, if you like consistency, you can also check out the [isomorphic-fetch](https://www.npmjs.com/package/isomorphic-fetch) package in order to use Fetch on the server-side.
+> For those unfamiliar with JavaScript's relatively new [Fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch) API, it's basically a native AXIOS killer (at least as far as the client-side is concerned -- it's not supported by Node, but it will be by Deno). Additionally, if you like consistency, you can also check out the [isomorphic-fetch](https://www.npmjs.com/package/isomorphic-fetch) package in order to use Fetch on the server-side.
 
-And we're finished. Now because, again, our front and back-end are separate, we'll need to run both of our apps separately.
+And we're finished. Now because, again, our front and back ends are separate, we'll need to run both of our apps separately.
 
 Let's open our project's root folder in two separate terminal windows.
 
-In the first, change into our "api" directory, and then run `flask run`. If all goes well, the Flask API should be running. In our second terminal, change into the "webapp" directory and run `npm run serve`.
+In the first, change into the "api" directory, and then run `flask run`. If all goes well, the Flask API should be running. In the second terminal, change into the "webapp" directory and run `npm run serve`.
 
-Once the Vue app is up, you should be able to access it from `localhost:8080`. If everything works, you should be greeted twice: Once by Vue, and again from your Flask API:
+Once the Vue app is up, you should be able to access it from `localhost:8080`. If everything works, you should be greeted twice -- once by Vue, and again from your Flask API:
 
 ```
 Hello, Vue!
@@ -358,68 +346,68 @@ Your final file tree should look like:
     ... {{ Vue project }}
 ```
 
-## Complete Separation of Flask and a Vue SPA with Server-Side Rendering (SSR) using Nuxt
+## Single-Page Application with Nuxt
 
 If SEO is as important to you as UX, you might want to implement SSR in some format.
 
-SSR makes it easier for search engines to navigate and index your web app, as you'll be able to give them a form of your web app that doesn't require JavaScript to generate. It can also make it quicker for users to interact with your app, since much of your initial content will be rendered before it's sent to your user.
-In other words, your user will not have to wait for all of your content to load asynchronously.
+SSR makes it easier for search engines to navigate and index your Vue app, as you'll be able to give them a form of your app that doesn't require JavaScript to generate. It can also make it quicker for users to interact with your app, since much of your initial content will be rendered before it's sent to them.
+In other words, users will not have to wait for all of your content to load asynchronously.
 
 > A Single-Page App with Server-Side Rendering is also called a Universal App.
 
 Although it's possible to implement SSR manually, we'll use [Nuxt](https://nuxtjs.org/) in this post; it greatly simplifies things.
 
-Just like in method 2, your front and back-end will be completely separate, only you'll be using Nuxt instead of the Vue CLI.
+Just like in the 'SPA' section, your front and back ends will be completely separate, only you'll be using Nuxt instead of the Vue CLI.
 
 ### Pros
 
-* All of the pros of method 2 with the addition of Server-Side Rendering.
+* All of the pros of the 'SPA' section with the addition of Server-Side Rendering.
 
 ### Cons
 
-* About as difficult to set up as method 2.
-* Conceptually, there's even more to learn than method 2 as Nuxt is essentially just another layer on top of Vue.
+* About as difficult to set up as the 'SPA' section.
+* Conceptually, there's even more to learn as Nuxt is essentially just another layer on top of Vue.
 
 ### Best For
 
-* Apps where SEO is as important as UX.
+* Apps where SEO is as important as UX
 
-*Additional Dependencies:*
+### Additional Dependencies
 
 1. Node/npm
 1. Nuxt
-1. Flask-Cors
+1. Flask-CORS
 
 ### Setup
 
-This is going to be very similar to the last method. In fact, the Flask portion is the exact same. Follow along with it setup until you have created your API.
+This is going to be very similar to the 'SPA' section. In fact, the Flask portion is the exact same. Follow along with it until you have created your Flask API.
 
-Once your API is finished, within your terminal, open your project's root folder and run the command `npx create-nuxt-app webapp`.
-This will let you interactively generate a new Nuxt project without installing any global dependencies.
+Once your API is finished, within your terminal, open your project's root folder and run the command `npx create-nuxt-app webapp`. This will let you interactively generate a new Nuxt project without installing any global dependencies.
 
 Any options should be fine here.
 
-Once your project is done being generated, dive into your new "webapp" folder. Go into "pages", and then open *index.vue* in your text editor. Similarly to method 2, delete everything within the `div` that has the class `container`. Inside the div, create two `p` tags with the same vars as the last method: `{{ greeting }}` and `{{ flaskGreeting }}`.
+Once your project is done being generated, dive into your new "webapp" folder. Within the "pages" folder, open *index.vue* in your text editor. Similarly, delete everything within the `div` that has the class `container`. Inside the div, create two `p` tags with the same vars: `{{ greeting }}` and `{{ flaskGreeting }}`.
 
 It should look like this:
 
 ```html
 <template>
-<div class="container">
+  <div class="container">
     <p>{{ greeting }}</p>
     <p>{{ flaskGreeting }}</p>
-</div>
+  </div>
 </template>
 ```
 
-And now for our script. Like method 2:
-    * Add a `data` key that returns an object with the variables `greeting` and `flaskGreeting`
-    * Add a `created` lifecycle hook with the same code as in method 2
-        * `await` `fetch` to get the JSON greeting from our API (on port 5000 unless you changed it)
-        * `await` the `json()` method to asynchronously get our JSON data from our API's response
-        * Set our Vue instance's `flaskGreeting` to the `greeting` key from our response's JSON object
+And now for our script:
 
-Minus the missing `name` and a different generated component, our Vue object should look the same:
+* Add a `data` key that returns an object with the variables `greeting` and `flaskGreeting`
+* Add a `created` lifecycle hook:
+    * `await` `fetch` to get the JSON greeting from our API (on port 5000 unless you changed it)
+    * `await` the `json()` method to asynchronously get our JSON data from our API's response
+    * Set our Vue instance's `flaskGreeting` to the `greeting` key from our response's JSON object
+
+The Vue object should look like:
 
 ```javascript
 export default {
@@ -440,9 +428,9 @@ export default {
 }
 ```
 
-Running our app and API will look very similar to the last method as well.
+Running the Nuxt/Vue app and Flask API will look very similar to the the 'SPA' section as well.
 
-Open two terminals. Within the first, change into "api" and run the `flask run` command. Withing the second, change into "webapp" and run `npm run dev` to start
+Open two terminals. Within the first, change into "api" and run the `flask run` command. Within the second, change into "webapp" and run `npm run dev` to start
 a development server for your Nuxt project.
 
 Once the Nuxt app is up, you should be able to access it from `localhost:3000`:
@@ -469,7 +457,8 @@ Our final tree:
 I mentioned the benefits of SEO earlier in this post, but just to show you what I meant, I ran both web apps as-is, and grabbed the Lighthouse SEO scores for both.
 
 With no changes to either app, here's what we have:
-![Lighthouse SEO Scores for our Vue and Nuxt Apps](https://user-images.githubusercontent.com/32235747/83606977-11012880-a540-11ea-9a11-e89703395e6d.png)
+
+<img src="/static/images/blog/combine-flask-vue/seo_comparison_vue_nuxt.png" style="max-width:100%;" alt="Lighthouse SEO Scores for our Vue and Nuxt App">
 
 Again, there are things you can do to improve your pure Vue SEO score. Lighthouse in Chrome's dev tools mentions adding a meta description, but with no additional intervention, Nuxt gave us a perfect SEO score.
 
@@ -477,7 +466,7 @@ Additionally, you can actually see the difference between the SSR that Nuxt does
 
 For more information on the differences between Nuxt and Vue, you can check out [these](https://www.bornfight.com/blog/nuxt-js-over-vue-js-when-should-you-use-it-and-why/) [posts](https://blog.logrocket.com/how-nuxt-js-solves-the-seo-problems-in-vue-js/).
 
-## Partial separation using Flask blueprints
+## Flask Blueprint
 
 Perhaps you already have a small Flask app developed and you want to build a Vue app as more of a means to an end rather than as the main event.
 
@@ -498,9 +487,8 @@ This will look a lot like method 1, but the code will be more organized.
 
 ### Cons
 
-* Workarounds might be necessary to allow a full SPA
-* Accessing the API might be slightly more annoying from a separate front-end (such as a mobile app)
-as the front and back ends are not completely separate
+* Workarounds might be necessary to allow a full SPA.
+* Accessing the API might be slightly more annoying from a separate front-end (such as a mobile app) as the front and back ends are not completely separate.
 
 ### Best For
 
@@ -508,17 +496,21 @@ as the front and back ends are not completely separate
 * You're building a front-end onto an already-existing Flask app
 * Small web apps that are made up of only a couple of HTML pages
 
-*Additional Dependencies:*
+### Additional Dependencies
 
-Similarly to method 1, we will be using a CDN to pull in the Vue library.
+Similarly to method 1, we will be using a CDN to pull in the Vue library:
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+```
 
 ### Setup
 
 Like the other methods, create a new folder to house your code. Inside of it, create two folders: "api" and "client". Intuitively, these will contain the blueprints for our API and client (Vue), respectively.
 
-Let's dive into our "api" folder.
+Let's dive into the "api" folder.
 
-Create a file called *api.py*. This will contain all of the code associated with our API. Additionally, because we will be accessing this file/folder as a module, create an `__init__.py` file:
+Create a file called *api.py*. This will contain all of the code associated with our API. Additionally, because we will be accessing this file/folder as a module, create an *\_\_init\_\_.py* file:
 
 ```python
 from flask import Blueprint
@@ -530,7 +522,7 @@ def greeting():
     return {'greeting': 'Hello from Flask!'}
 ```
 
-The first argument to `Blueprint` first is for Flask's routing system. The second, `__name__`, is equivalent to a Flask app's first argument (`Flask(__name__)`).
+The first argument to `Blueprint` is for Flask's routing system. The second, `__name__`, is equivalent to a Flask app's first argument (`Flask(__name__)`).
 
 And that's it with our API blueprint.
 
@@ -606,7 +598,7 @@ const vm = new Vue({ // Again, vm is our Vue instance's name for consistency.
 
 Again, we created the Vue context, set our instance's `el` as `'#vm'`, changed the default delimiters from `'{{', '}}'` to `'[[', ']]'`, and added a data element with the key/value of `greeting`: `'Hello, Vue!'`.
 
-Because we're also going to pull a greeting from our API, create a data placeholder called 'flaskGreeting' with the value of an empty string.
+Because we're also going to pull a greeting from our API, create a data placeholder called `flaskGreeting` with the value of an empty string.
 
 ```javascript
 const apiEndpoint = '/api_v1/';
@@ -678,8 +670,16 @@ Final file tree:
         └───index.html
 ```
 
-And that's it! If you run your new app with `flask run` you should be greeted twice: once by Vue itself and again by a response from your Flask API.
+And that's it! If you run your new app with `flask run` you should be greeted twice -- once by Vue itself and again by a response from your Flask API.
 
 ## Summary
 
-There are many, many different ways in which to build a web app using Vue and Flask. Hopefully this gives you an idea about how to build yours.
+There are many, many different ways in which to build a web app using Vue and Flask. It all depends on your situation at hand.
+
+Some questions to ask:
+
+1. How important is SEO?
+1. What does your development team look like? If you don't have a DevOps team, do you want to take on the added complexity of having to deploy the front and back end separately?
+1. Are you just rapid prototyping?
+
+Hopefully this post steers you in the right direction, giving you an idea about how to combine your Vue and Flask applications.
