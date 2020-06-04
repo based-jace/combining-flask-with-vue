@@ -19,6 +19,10 @@ modified_date: 2020-06-05
 
 *How can I combine Vue.js with Flask?*
 
+So you've finally got Flask under your belt, and you're no stranger to JavaScript. You've even developed a few web applications, but you start to realize something -- you have excellent functionality, but your UX is kind of bland. Where's the application flow and seamless navigation you see on many popular websites and apps today? How can that be achieved?
+
+As you become more invested in your websites and web apps, you will probably want to add more client-side functionality and reactivity to them. Modern web development typically achieves this through the use of front-end frameworks, and one such framework that is quickly rising in popularity is [Vue](https://vuejs.org/) (also known as Vue.js or VueJS). 
+
 Depending on your project's requirements, there are a few different ways to build a web application with Flask and Vue, and they each involve various levels of back-end/front-end separation.
 
 In this post, we'll take a look at three different methods for combining Flask and Vue:
@@ -51,7 +55,7 @@ You can import the Vue library either through a Content Delivery Network (CDN) o
 
 ### Cons
 
-* You have to import Vue on and set up each page individually, which can be difficult if you start adding Vue to a number of pages. It may require a number of workarounds as well since it's not really the intended way to use either Flask or Vue.
+* You have to import Vue on and set up each page individually, which can be difficult if you start adding Vue to more and more pages. It may require a number of workarounds as well since it's not really the intended way to use either Flask or Vue.
 
 ### Best For
 
@@ -171,7 +175,7 @@ That's it! Method 1 is done. You can mix and match JSON endpoints and HTML endpo
 
 With each additional HTML page, you'll have to either import the same JavaScript file and account for variables and elements that may not apply to it or create a new Vue object for each page. A true SPA will be difficult, but not impossible -- theoretically you could write a tiny JavaScript library that will asynchronously grab HTML pages/elements served by Flask.
 
-> I've actually created my own JavaScript library for this before. It was big a hassle and honestly not worth it, especially considering JavaScript will not run script tags imported this way. You'll also be reinventing the wheel.
+> I've actually created my own JavaScript library for this before. It was big a hassle and honestly not worth it, especially considering JavaScript will not run script tags imported this way, unless you build the functionality yourself. You'll also be reinventing the wheel.
 >
 > If you'd like to check out my implementation of this method, you can find it on [GitHub](https://github.com/based-jace/load-script-async). The library takes a given chunk of HTML and replaces the specified HTML on the page with it. If the given HTML contains no `<script>` elements (it checks using regex), it simply uses `HTMLElement.innerHTML` to replace it. If it does contain `<script>` elements, it recursively adds the nodes, recreating any `<script>` nodes that come up, allowing your JavaScript to run.
 >
@@ -189,7 +193,9 @@ With this method, you'll want to generate a completely separate Vue app using th
 
 ### Pros
 
-* Your front and back ends will be completely independent of each other, so you can make changes to one without it impacting the other. They can also be deployed, developed, and maintained separately. Finally, you can set up a number of other front-ends to interact with your Flask API.
+* Your front and back ends will be completely independent of each other, so you can make changes to one without it impacting the other.
+  * This allows them to be deployed, developed, and maintained separately. 
+  * You can even set up a number of other front-ends to interact with your Flask API if you'd like.
 * Your front-end experience will be much smoother and more seamless.
 
 ### Cons
@@ -225,6 +231,8 @@ Let's start with our Flask API.
 First, create a folder to hold the code for your project. Inside, create a folder called "api". Create an *app.py* file in the folder. Open the file with your favorite text editor. This time we'll need to import `Flask` from `flask` and `CORS` from `flask_cors`. Because we're using `flask_cors` to enable cross-origin resource sharing, wrap the app object (without setting a new variable) with `CORS`: `CORS(app)`. That's all we have to do to enable CORS on all of our routes for any origin.
 
 > Although this is fine for demonstration purposes, you probably aren't going to want just any app or website to be able to access your API. In that case you can use the kwarg 'origins' with the CORS function to add a list of acceptable origins -- i.e., `CORS(app, origins=["origin1", "origin2"])`
+
+> For more information on Cross-Origin Resource Sharing, MDN has some great [documentation](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) on it.
 
 Lastly, create a single greeting route at `/greeting` to return a JSON object with a single key/value:
 
@@ -392,10 +400,10 @@ It should look like this:
 
 ```html
 <template>
-  <div class="container">
+<div class="container">
     <p>{{ greeting }}</p>
     <p>{{ flaskGreeting }}</p>
-  </div>
+</div>
 </template>
 ```
 
@@ -430,8 +438,7 @@ export default {
 
 Running the Nuxt/Vue app and Flask API will look very similar to the the 'SPA' section as well.
 
-Open two terminals. Within the first, change into "api" and run the `flask run` command. Within the second, change into "webapp" and run `npm run dev` to start
-a development server for your Nuxt project.
+Open two terminals. Within the first, change into "api" and run the `flask run` command. Within the second, change into "webapp" and run `npm run dev` to start a development server for your Nuxt project.
 
 Once the Nuxt app is up, you should be able to access it from `localhost:3000`:
 
@@ -473,7 +480,7 @@ Perhaps you already have a small Flask app developed and you want to build a Vue
 Examples:
 
 1. Prototype to demonstrate functionality to your employer or client (you can always replace this or hand it off to a front-end developer later on)
-1. You just don't want to deal with the potential frustration that could result when deploying completely separate front and back-ends.
+1. You just don't want to deal with the potential frustration that could result when deploying completely separate front and back ends.
 
 In that case you could sort-of meet in the middle by keeping your Flask app, but building on a Vue front-end within its own Flask blueprint.
 
