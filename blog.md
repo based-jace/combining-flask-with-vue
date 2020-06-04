@@ -5,8 +5,8 @@ share: true
 toc: true
 permalink: combine-flask-vue
 type: blog
-author: Michael Herman
-lastname: herman
+author: Jace Medlin
+lastname: medlin
 description: In this post, we'll take a look at three different methods for combining Flask and Vue.
 keywords: "flask, vue, flask and vue, flask single page application, flask spa, flask vue"
 topics: "flask, vue, api"
