@@ -1,5 +1,5 @@
 # Combining Flask and Vue
-Blog post for [testdriven.io](https://testdriven.io/). You can find the post [here](https://testdriven.io/blog/combine-flask-vue/).
+Blog post for [testdriven.io](https://testdriven.io/). If you want to follow along and create the projects yourself, you can find the post [here](https://testdriven.io/blog/combine-flask-vue/).
 
 ## Initial Setup
 If you don't already have them, install [Git](https://git-scm.com/downloads), [Python](https://www.python.org/downloads/), and [node](https://nodejs.org/en/download/).
